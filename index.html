@@ -112,6 +112,22 @@ footer {
   font-size: .8rem;
 }
 
+.secret-link {
+  color: #00ffff;
+  text-decoration: underline;
+  cursor: pointer;
+  text-shadow: 0 0 5px #00ffff;
+  transition: all 0.3s ease;
+}
+.secret-link:hover {
+  color: #ff0033;
+  text-shadow: 0 0 8px #ff0033;
+}
+.secret-link:focus-visible {
+  outline: 2px dashed #00ff99;
+  outline-offset: 4px;
+}
+
   </style>
 </head>
 <body>
@@ -146,8 +162,8 @@ footer {
     </ul>
   </section>  <section>
     <h2>Hidden Path</h2>
-    <p>If you dare uncover the truth, <a class="secret-link">click here</a>.</p>
-  </section>  <div id="popup" class="popup"></div>  <footer>
+    <p>If you dare uncover the truth, <a href="#" class="secret-link" role="button" aria-label="Decrypt secret path to social profile">click here</a>.</p>
+  </section>  <div id="popup" class="popup" role="status" aria-live="polite"></div>  <footer>
     <p>&copy; 2015 Ali Hasan Archive. .</p>
   </footer>  <script>
     /* === MATRIX RAIN === */
@@ -206,11 +222,18 @@ footer {
 
     /* === SECRET LINK === */
     let clicks=0;
-    document.querySelector(".secret-link").addEventListener("click",()=>{
+    document.querySelector(".secret-link").addEventListener("click",(e)=>{
+      e.preventDefault();
       clicks++;
-      showPopup("Decrypting secret...");
-      if(clicks>=3){
-        window.location.href="https://www.instagram.com/ig.alihasan";
+      if(clicks===1){
+        showPopup("Decrypting secret... [1/3]");
+      } else if(clicks===2){
+        showPopup("Bypassing secure mainframe... [2/3]");
+      } else if(clicks>=3){
+        showPopup("Access granted! Redirecting... [3/3]");
+        setTimeout(()=>{
+          window.location.href="https://www.instagram.com/ig.alihasan";
+        },1000);
       }
     });
   </script></body>
