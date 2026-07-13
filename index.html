@@ -1,217 +1,1966 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ali Hasan</title>
+  <title>Ali Hasan // COG-NET OS v7.1</title>
   <style>
-    /* === BASIC BODY === */
-    body {
+    /* === CRT Retro & Theme Colors === */
+    :root {
+      --primary: #00ff66;
+      --primary-glow: rgba(0, 255, 102, 0.4);
+      --bg: #030a05;
+      --bg-darker: #010402;
+      --border: #00ff66;
+      --text: #00ff66;
+      --accent: #ff0055;
+      --scanline-opacity: 0.12;
+      --phosphor-glow: 0 0 10px rgba(0, 255, 102, 0.5);
+    }
+
+    /* Green Matrix Theme */
+    [data-theme="green"] {
+      --primary: #00ff66;
+      --primary-glow: rgba(0, 255, 102, 0.4);
+      --bg: #030a05;
+      --bg-darker: #010402;
+      --border: #00ff66;
+      --text: #00ff66;
+      --accent: #00ffff;
+      --phosphor-glow: 0 0 10px rgba(0, 255, 102, 0.5);
+    }
+
+    /* Fallout Amber Theme */
+    [data-theme="amber"] {
+      --primary: #ffb000;
+      --primary-glow: rgba(255, 176, 0, 0.4);
+      --bg: #140b00;
+      --bg-darker: #050200;
+      --border: #ffb000;
+      --text: #ffb000;
+      --accent: #00ffff;
+      --phosphor-glow: 0 0 10px rgba(255, 176, 0, 0.5);
+    }
+
+    /* Cyberpunk Neon */
+    [data-theme="cyberpunk"] {
+      --primary: #ff007f;
+      --primary-glow: rgba(255, 0, 127, 0.4);
+      --bg: #0a000f;
+      --bg-darker: #030005;
+      --border: #00ffff;
+      --text: #00ffff;
+      --accent: #ff007f;
+      --phosphor-glow: 0 0 12px rgba(0, 255, 255, 0.5);
+    }
+
+    /* Infiltrator Red */
+    [data-theme="red"] {
+      --primary: #ff3333;
+      --primary-glow: rgba(255, 51, 51, 0.4);
+      --bg: #120000;
+      --bg-darker: #050000;
+      --border: #ff3333;
+      --text: #ff3333;
+      --accent: #ffff00;
+      --phosphor-glow: 0 0 10px rgba(255, 51, 51, 0.5);
+    }
+
+    /* === BASE RESET === */
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      background: black;
-      color: #00ff99;
-      font-family: 'Courier New', monospace;
-      overflow-x: hidden;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-darker);
+      color: var(--text);
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
       position: relative;
     }
-    header {
-      text-align: center;
-      padding: 2rem 1rem;
+
+    /* === CRT SCREEN SIMULATION === */
+    .crt-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 6px solid #1c1c1c;
+      box-shadow: inset 0 0 80px rgba(0,0,0,1);
+      z-index: 10;
     }
-    h1 {
-      font-size: 3rem;
-      color: #00ff99;
-      text-shadow: 0 0 10px #00ff99, 0 0 20px #ff0033;
-      animation: glitchTitle 2s infinite;
-    }/* === GLITCH TITLE === */
-@keyframes glitchTitle {
-  0% { text-shadow: 2px 2px #ff0033, -2px -2px #00ffff; }
-  25% { text-shadow: -2px 0 #ff0, 2px 2px #00ffff; }
-  50% { text-shadow: 2px -2px #ff0033, -2px 2px #00ff99; }
-  75% { text-shadow: -2px 2px #ff0, 2px -2px #ff0033; }
-  100% { text-shadow: 2px 2px #ff0033, -2px -2px #00ffff; }
-}
 
-section {
-  max-width: 900px;
-  margin: auto;
-  padding: 2rem 1rem;
-  line-height: 1.7;
-}
+    /* CRT Phosphor Scanline Overlay */
+    .crt-screen::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 999;
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
 
-h2 {
-  color: #ff0033;
-  text-shadow: 0 0 6px #ff0033;
-  margin-bottom: 1rem;
-}
+    /* Subtle screen flicker */
+    .crt-screen::after {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: rgba(18, 16, 16, 0.1);
+      opacity: 0;
+      z-index: 1000;
+      pointer-events: none;
+      animation: flicker 0.15s infinite;
+    }
 
-p, li {
-  font-size: 1rem;
-  animation: textGlitch 6s infinite;
-}
+    @keyframes flicker {
+      0% { opacity: 0.15; }
+      50% { opacity: 0.18; }
+      100% { opacity: 0.14; }
+    }
 
-/* === TEXT GLITCH === */
-@keyframes textGlitch {
-  0% { color: #00ff99; }
-  25% { color: #ff0033; }
-  50% { color: #00ffff; }
-  75% { color: #ff0; }
-  100% { color: #00ff99; }
-}
+    /* Static matrix rain background container */
+    canvas#matrixRain {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      opacity: 0.15;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
 
-.redacted {
-  background: #ff0033;
-  color: #000;
-  padding: 0 4px;
-}
+    /* === BOOT SEQUENCE OVERLAY === */
+    #bootOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-darker);
+      color: var(--primary);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding: 3rem;
+      font-size: 1.1rem;
+      overflow-y: auto;
+    }
 
-/* === MATRIX RAIN === */
-canvas#matrixRain {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-}
+    #bootOverlay .skip-btn {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.5rem 1.5rem;
+      font-family: monospace;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 0 5px var(--accent);
+    }
 
-/* === POPUP === */
-.popup {
-  position: fixed;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(10,0,20,0.9);
-  border: 2px solid #ff0033;
-  box-shadow: 0 0 15px #ff0033, 0 0 25px #00ff99;
-  padding: 1rem 2rem;
-  z-index: 9999;
-  font-size: 1rem;
-  color: #fff;
-  font-family: 'Tahoma', sans-serif;
-  display: none;
-  animation: popupFlicker 1s infinite alternate;
-}
-@keyframes popupFlicker {
-  from { box-shadow: 0 0 5px #ff0033; opacity: 0.8; }
-  to { box-shadow: 0 0 20px #00ffff; opacity: 1; }
-}
-.popup::before {
-  content: 'SYSTEM WARNING';
-  display: block;
-  font-weight: bold;
-  color: #ff0033;
-  border-bottom: 1px solid #6600ff;
-  margin-bottom: .5rem;
-}
+    #bootOverlay .skip-btn:hover {
+      background: var(--accent);
+      color: #000;
+    }
 
-footer {
-  text-align: center;
-  padding: 2rem;
-  opacity: 0.6;
-  font-size: .8rem;
-}
+    /* === HEADER BAR === */
+    header {
+      background-color: var(--bg);
+      border-bottom: 2px solid var(--border);
+      padding: 0.5rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+      box-shadow: var(--phosphor-glow);
+    }
 
+    .system-title {
+      font-size: 1.1rem;
+      text-shadow: var(--phosphor-glow);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .system-pulse {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      box-shadow: var(--phosphor-glow);
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { opacity: 0.3; }
+      to { opacity: 1; }
+    }
+
+    .clock {
+      font-size: 1rem;
+      color: var(--primary);
+    }
+
+    /* === WORKSPACE / SYSTEM LAYOUT === */
+    .workspace {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 280px 1fr 280px;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    @media (max-width: 1024px) {
+      .workspace {
+        grid-template-columns: 240px 1fr;
+      }
+      .right-sidebar {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+      .left-sidebar {
+        display: none;
+      }
+    }
+
+    /* === SIDEBAR STYLING === */
+    aside {
+      background-color: var(--bg);
+      border-right: 2px solid var(--border);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow-y: auto;
+      font-size: 0.85rem;
+    }
+
+    .right-sidebar {
+      border-right: none;
+      border-left: 2px solid var(--border);
+    }
+
+    .sidebar-section {
+      border: 1px solid var(--border);
+      padding: 0.8rem;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 4px;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+    }
+
+    .sidebar-section h3 {
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.6rem;
+      padding-bottom: 0.3rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+    }
+
+    /* Profile Pic styling with CRT effects */
+    .profile-container {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      border: 1px solid var(--border);
+      background-color: #000;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+    }
+
+    .profile-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(100%) contrast(150%) brightness(80%);
+      transition: filter 0.3s;
+      mix-blend-mode: luminosity;
+    }
+
+    .profile-container:hover .profile-img {
+      filter: none;
+      mix-blend-mode: normal;
+    }
+
+    .profile-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(rgba(0, 255, 102, 0.15) 0%, rgba(0, 0, 0, 0.5) 100%);
+      pointer-events: none;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    }
+
+    /* Live Equalizer Animation */
+    .equalizer-canvas {
+      width: 100%;
+      height: 40px;
+      background-color: #000;
+      border: 1px solid var(--border);
+      margin-top: 0.5rem;
+    }
+
+    /* Theme toggles */
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.4rem;
+    }
+
+    .theme-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem;
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 0.75rem;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .theme-btn:hover, .theme-btn.active {
+      background: var(--primary);
+      color: #000;
+      box-shadow: var(--phosphor-glow);
+    }
+
+    /* Macro shortcut links */
+    .macro-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.4rem;
+    }
+
+    .macro-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem;
+      font-family: monospace;
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-align: center;
+      text-shadow: var(--phosphor-glow);
+    }
+
+    .macro-btn:hover {
+      background: var(--primary);
+      color: #000;
+      box-shadow: var(--phosphor-glow);
+    }
+
+    /* Real-time cyber diagnostics lists */
+    .diagnostic-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .diagnostic-bar {
+      width: 100%;
+      height: 6px;
+      border: 1px solid var(--border);
+      margin-top: 0.2rem;
+      overflow: hidden;
+    }
+
+    .diagnostic-bar-fill {
+      height: 100%;
+      background-color: var(--primary);
+      width: 45%;
+      transition: width 0.4s ease;
+    }
+
+    /* === CENTRAL TERMINAL STYLING === */
+    .main-terminal {
+      display: flex;
+      flex-direction: column;
+      background-color: rgba(1, 4, 2, 0.85);
+      position: relative;
+      overflow: hidden;
+      padding: 1rem;
+    }
+
+    .terminal-output {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      padding-right: 0.5rem;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .terminal-output div {
+      white-space: pre-wrap;
+    }
+
+    /* Scrollbars customization */
+    .terminal-output::-webkit-scrollbar, aside::-webkit-scrollbar {
+      width: 6px;
+    }
+    .terminal-output::-webkit-scrollbar-track, aside::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.2);
+    }
+    .terminal-output::-webkit-scrollbar-thumb, aside::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+
+    /* Glitch text effect */
+    .glitch-text {
+      animation: textGlow 4s infinite alternate;
+      color: var(--accent);
+    }
+
+    @keyframes textGlow {
+      from { text-shadow: 0 0 2px var(--accent); }
+      to { text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent); }
+    }
+
+    .line-success { color: var(--primary); }
+    .line-warning { color: #ffff00; }
+    .line-error { color: #ff3333; }
+    .line-accent { color: var(--accent); }
+    .line-header {
+      font-size: 1.1rem;
+      color: var(--primary);
+      text-shadow: var(--phosphor-glow);
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 0.3rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Terminal Prompt Entry */
+    .terminal-prompt {
+      display: flex;
+      align-items: center;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 0.6rem;
+      font-size: 1rem;
+      position: relative;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+    }
+
+    .prompt-label {
+      color: var(--primary);
+      margin-right: 0.5rem;
+      text-shadow: var(--phosphor-glow);
+    }
+
+    .terminal-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1rem;
+      font-weight: bold;
+      caret-color: transparent; /* custom cursor */
+    }
+
+    .custom-cursor {
+      width: 8px;
+      height: 15px;
+      background-color: var(--primary);
+      display: inline-block;
+      animation: blink 0.8s infinite;
+      box-shadow: var(--phosphor-glow);
+      position: absolute;
+    }
+
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    /* === GAME CONTAINER (IN-TERMINAL / CANVASES) === */
+    .game-viewport {
+      display: none;
+      border: 2px solid var(--border);
+      background-color: #000;
+      position: relative;
+      padding: 1rem;
+      margin-top: 0.5rem;
+      box-shadow: inset 0 0 20px rgba(0,255,102,0.15);
+    }
+
+    .game-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: monospace;
+      color: var(--primary);
+      line-height: 1.2;
+      text-align: center;
+      white-space: pre-wrap;
+    }
+
+    /* Game controls / instructions */
+    .game-status-bar {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      border-bottom: 1px dashed var(--border);
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.4rem;
+      font-size: 0.9rem;
+    }
+
+    /* Mobile D-Pad overlay */
+    .mobile-controls {
+      display: none; /* activated on touch/mobile devices or on game screen */
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      width: 120px;
+      height: 120px;
+      margin: 1rem auto;
+      gap: 3px;
+    }
+
+    .dpad-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .dpad-btn:active {
+      background: var(--primary);
+      color: #000;
+    }
+
+    /* === AUDIO TOGGLE SPEAKER === */
+    .audio-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      background: rgba(0,0,0,0.5);
+    }
+
+    .audio-indicator.muted {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* ASCII Game Grid Layout */
+    .maze-grid {
+      font-size: 14px;
+      letter-spacing: 2px;
+      line-height: 1;
+      font-family: monospace;
+      color: var(--primary);
+    }
+
+    /* Fallout Hacker game elements */
+    .fallout-word {
+      cursor: pointer;
+      padding: 0 2px;
+    }
+    .fallout-word:hover {
+      background-color: var(--primary);
+      color: #000 !important;
+    }
+
+    /* Footer styling */
+    footer {
+      border-top: 2px solid var(--border);
+      background-color: var(--bg);
+      padding: 0.4rem 1rem;
+      font-size: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+    }
+
+    /* Overlay visual popups */
+    .cyber-popup {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--bg-darker);
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 25px var(--accent);
+      padding: 1.5rem;
+      z-index: 50;
+      max-width: 400px;
+      display: none;
+      font-size: 0.9rem;
+    }
+
+    .cyber-popup-header {
+      color: var(--accent);
+      font-size: 1.1rem;
+      border-bottom: 1px solid var(--accent);
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.8rem;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .cyber-popup-close {
+      margin-top: 1rem;
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 0.3rem 1rem;
+      cursor: pointer;
+      width: 100%;
+    }
+    .cyber-popup-close:hover {
+      background: var(--accent);
+      color: #000;
+    }
   </style>
 </head>
-<body>
-  <canvas id="matrixRain"></canvas>  <header>
-    <h1>Ali Hasan</h1>
-  </header>  <section>
-    <h2>Introduction</h2>
-    <p>Ali Hasan (born June 12, 2005) is an <span class="glitch-text">enigmatic</span> figure whose name resonates across dark networks. Legends depict him as a digital phantom, haunting systems with spectral fingerprints.</p>
-  </section>  <section>
-    <h2>Infamous Origins</h2>
-    <p>By 15, rumors whispered he breached systems considered untouchable. Forums saw posts vanish seconds after appearing. One chilling quote remains: <q>Reality is editable.</q></p>
-  </section>  <section>
-    <h2>The Blackout Incident</h2>
-    <p>In 2021, several grids went dark simultaneously. Screens glowed with one repeating line: 12/06/2005. Many believe Ali Hasan authored this silent attack.</p>
-  </section>  <section>
-    <h2>Government Pursuit</h2>
-    <p>Reports suggest the FBI, CIA, and INTERPOL labeled his files <span class="redacted">CLASSIFIED</span>. An alleged bounty of $2,000,000 circulated, yet no one has surfaced to claim it.</p>
-  </section>  <section>
-    <h2>Disappearance</h2>
-    <p>By 2025, traces of Ali Hasan diminished. Some insist he merged with data. Others claim he was erased. Glitches across the internet — phantom code, corrupted images — are his supposed legacy.</p>
-  </section>  <section>
-    <h2>Legacy & Myth</h2>
-    <p>Communities attempt to decode fragments linked to him. Many fail. Some compile into eerie messages: <q>I am still here.</q></p>
-  </section>  <section>
-    <h2>Timeline</h2>
-    <ul>
-      <li><strong>2005:</strong> Birth of Ali Hasan</li>
-      <li><strong>2015:</strong> First online traces</li>
-      <li><strong>2020:</strong> Alleged breach of <span class="redacted">REDACTED</span></li>
-      <li><strong>2021:</strong> The Blackout Incident</li>
-      <li><strong>2025:</strong> Vanishing</li>
-    </ul>
-  </section>  <section>
-    <h2>Hidden Path</h2>
-    <p>If you dare uncover the truth, <a class="secret-link">click here</a>.</p>
-  </section>  <div id="popup" class="popup"></div>  <footer>
-    <p>&copy; 2015 Ali Hasan Archive. .</p>
-  </footer>  <script>
-    /* === MATRIX RAIN === */
-    const canvas = document.getElementById('matrixRain');
-    const ctx = canvas.getContext('2d');
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
+<body data-theme="green">
 
-    const letters = 'アリハサン01☣∆░▒▓█><\\/'.split('');
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = [];
-    for(let x=0; x<columns; x++) drops[x]=1;
+  <!-- CRT SCREEN CONTAINER -->
+  <div class="crt-screen">
 
-    function drawMatrix(){
-      ctx.fillStyle='rgba(0,0,0,0.05)';
-      ctx.fillRect(0,0,canvas.width,canvas.height);
-      ctx.fillStyle='#0F0';
-      ctx.font=fontSize+'px monospace';
-      for(let i=0;i<drops.length;i++){
-        let text=letters[Math.floor(Math.random()*letters.length)];
-        ctx.fillText(text,i*fontSize,drops[i]*fontSize);
-        if(drops[i]*fontSize>canvas.height&&Math.random()>0.975) drops[i]=0;
-        drops[i]++;
+    <!-- Matrix rain overlay behind text -->
+    <canvas id="matrixRain"></canvas>
+
+    <!-- BOOT OVERLAY SIMULATION -->
+    <div id="bootOverlay">
+      <div id="bootConsole"></div>
+      <button class="skip-btn" onclick="skipBoot()">SKIP PROTOCOL [ANY KEY]</button>
+    </div>
+
+    <!-- HEADER BAR -->
+    <header>
+      <div class="system-title">
+        <div class="system-pulse"></div>
+        <span>ALIHASAN // COG-NET OS v7.1</span>
+      </div>
+
+      <!-- Audio Toggle -->
+      <div class="audio-indicator" id="audioToggleBtn" onclick="toggleAudioGlobal()">
+        <span id="audioSpeakerIcon">🔊</span>
+        <span id="audioStateLabel">AUDIO [ON]</span>
+      </div>
+
+      <div class="clock" id="systemClock">00:00:00</div>
+    </header>
+
+    <!-- CORE WORKSPACE -->
+    <div class="workspace">
+
+      <!-- LEFT SIDEBAR: DIAGNOSTICS & MACROS -->
+      <aside class="left-sidebar">
+
+        <!-- Profile Frame -->
+        <div class="sidebar-section">
+          <h3>Target Identity</h3>
+          <div class="profile-container" onclick="handleProfileTrigger()">
+            <img src="ali.jpg" alt="Ali Hasan Profile" class="profile-img" id="profilePic">
+            <div class="profile-overlay"></div>
+          </div>
+          <div style="font-size: 0.75rem; text-align: center; margin-top: 0.3rem;">
+            ALI HASAN (DOB: 12/06/2005)
+          </div>
+        </div>
+
+        <!-- CPU/Mem Load Diagnostics -->
+        <div class="sidebar-section">
+          <h3>System Analytics</h3>
+          <div class="diagnostic-item">
+            <span>CPU usage</span>
+            <span id="diagCPUVal">32%</span>
+          </div>
+          <div class="diagnostic-bar">
+            <div class="diagnostic-bar-fill" id="diagCPUBar" style="width: 32%;"></div>
+          </div>
+
+          <div class="diagnostic-item" style="margin-top: 0.8rem;">
+            <span>Decryption Node</span>
+            <span id="diagDecVal">128kb/s</span>
+          </div>
+          <div class="diagnostic-bar">
+            <div class="diagnostic-bar-fill" id="diagDecBar" style="width: 65%;"></div>
+          </div>
+
+          <div class="diagnostic-item" style="margin-top: 0.8rem;">
+            <span>Audio Spectrum</span>
+          </div>
+          <canvas class="equalizer-canvas" id="eqCanvas"></canvas>
+        </div>
+
+        <!-- Quick Keyboard Macros for Accessibility -->
+        <div class="sidebar-section">
+          <h3>Direct Directives</h3>
+          <div class="macro-grid">
+            <button class="macro-btn" onclick="executeMacro('help')">[HELP]</button>
+            <button class="macro-btn" onclick="executeMacro('about')">[ABOUT]</button>
+            <button class="macro-btn" onclick="executeMacro('timeline')">[TIMELINE]</button>
+            <button class="macro-btn" onclick="executeMacro('skills')">[SKILLS]</button>
+            <button class="macro-btn" onclick="executeMacro('play')">[MAZE_GAME]</button>
+            <button class="macro-btn" onclick="executeMacro('decrypt')">[PASSWORD_GAME]</button>
+            <button class="macro-btn" onclick="executeMacro('secret')">[CLASSIFIED]</button>
+            <button class="macro-btn" onclick="executeMacro('social')">[SOCIALS]</button>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- CENTER CONSOLE: THE MAIN TERMINAL & CORE INTERACTIONS -->
+      <main class="main-terminal">
+
+        <!-- Scrolling Output Screen -->
+        <div class="terminal-output" id="terminalOutput">
+          <!-- Populated by JavaScript script -->
+        </div>
+
+        <!-- IN-TERMINAL GAME VIEWPORT (Maze / Hacking) -->
+        <div class="game-viewport" id="gameViewport">
+          <div class="game-status-bar">
+            <span id="gameTitle">CYBER INFILTRATOR v1.0</span>
+            <span id="gameScores">DATA CORES: 0/5</span>
+            <span id="gameAlert" style="color: var(--accent);">THREAT: HIGH</span>
+          </div>
+          <div class="game-screen" id="gameScreen"></div>
+
+          <!-- Interactive Mobile Controllers -->
+          <div class="mobile-controls" id="mobileControls">
+            <div></div>
+            <button class="dpad-btn" onclick="handleDPad('UP')">▲</button>
+            <div></div>
+            <button class="dpad-btn" onclick="handleDPad('LEFT')">◀</button>
+            <button class="dpad-btn" style="background:var(--accent); color:#000" onclick="handleDPad('ACTION')">◉</button>
+            <button class="dpad-btn" onclick="handleDPad('RIGHT')">▶</button>
+            <div></div>
+            <button class="dpad-btn" onclick="handleDPad('DOWN')">▼</button>
+            <div></div>
+          </div>
+        </div>
+
+        <!-- Active Command Input Bar -->
+        <div class="terminal-prompt">
+          <span class="prompt-label">guest@cognet-node:~#</span>
+          <input type="text" class="terminal-input" id="terminalInput" autocomplete="off" spellcheck="false" autofocus>
+          <span class="custom-cursor" id="inputCursor"></span>
+        </div>
+
+      </main>
+
+      <!-- RIGHT SIDEBAR: NETWORK SPECS & THEME CONTROLLERS -->
+      <aside class="right-sidebar">
+
+        <!-- Live Alert logs -->
+        <div class="sidebar-section">
+          <h3>Network Intrusion</h3>
+          <div style="font-size: 0.75rem; max-height: 120px; overflow-y: hidden; line-height: 1.5;" id="alertContainer">
+            <div class="line-success">[ OK ] Proxy tunnel verified.</div>
+            <div class="line-warning">[ WARN ] Packet sniffers detected.</div>
+            <div class="line-error">[ ALARM ] Intruder Node Identified.</div>
+          </div>
+        </div>
+
+        <!-- Active Themes Selector -->
+        <div class="sidebar-section">
+          <h3>Deck Colors</h3>
+          <div class="theme-grid">
+            <button class="theme-btn active" id="theme-green" onclick="switchTheme('green')">MATRIX</button>
+            <button class="theme-btn" id="theme-amber" onclick="switchTheme('amber')">AMBER</button>
+            <button class="theme-btn" id="theme-cyberpunk" onclick="switchTheme('cyberpunk')">CYBER</button>
+            <button class="theme-btn" id="theme-red" onclick="switchTheme('red')">ALARM</button>
+          </div>
+        </div>
+
+        <!-- Decrypted Archive Progress Info -->
+        <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column;">
+          <h3>Dossier Progress</h3>
+          <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0.5rem; text-align: center;">
+            <div style="font-size: 1.5rem; color: var(--accent); text-shadow: var(--phosphor-glow);" id="completedCoresCount">0 / 3</div>
+            <div style="font-size: 0.75rem; text-transform: uppercase;">Classified Nodes Cracked</div>
+            <div class="diagnostic-bar" style="width: 80%;">
+              <div class="diagnostic-bar-fill" id="decryptedProgressFill" style="width: 0%;"></div>
+            </div>
+            <p style="font-size: 0.75rem; color: #999; margin-top: 0.5rem; padding: 0 0.2rem;">
+              Complete the decryption hacking challenge or infiltration to unlock full CIA records!
+            </p>
+          </div>
+        </div>
+
+      </aside>
+
+    </div>
+
+    <!-- CORE SYSTEM FOOTER -->
+    <footer>
+      <span>COG-NET CLIENT OS v7.1.0-RELEASE</span>
+      <span>SECURE ENCRYPTION: ACTIVE (AES-256)</span>
+      <span>&copy; 2015-2025 ALI HASAN SECURE ARCHIVE</span>
+    </footer>
+
+  </div>
+
+  <!-- CYBER ALERT POPUP OVERLAYS -->
+  <div class="cyber-popup" id="systemPopup">
+    <div class="cyber-popup-header" id="popupHeader">ALARM WARNING</div>
+    <div id="popupBody">Unauthorized system modification detected. Security grid compromised.</div>
+    <button class="cyber-popup-close" onclick="closePopup()">ACKNOWLEDGE PROTOCOL</button>
+  </div>
+
+  <!-- COMPLETE LOGICAL CONTROLS & WEB AUDIO SYNTHESIS -->
+  <script>
+    /* ==============================================
+       1. GLOBAL SYSTEM STATE
+       ============================================== */
+    const STATE = {
+      isMuted: false,
+      isTyping: false,
+      bootSkipped: false,
+      decryptionCores: 0,
+      activeGame: null, // "maze" or "fallout" or null
+      inputHistory: [],
+      historyIndex: -1,
+      currentTheme: 'green'
+    };
+
+    /* ==============================================
+       2. AUDIO SYNTHESIS ENGINE (Web Audio API)
+       ============================================== */
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
       }
     }
-    setInterval(drawMatrix,50);
 
-    /* === POPUPS === */
-    const popup=document.getElementById("popup");
-    const popupMessages=[
-      "SYSTEM BREACH DETECTED",
-      "YOU ARE BEING WATCHED",
-      "CONNECTION LOST — SEARCHING...",
-      "██████ FILE CORRUPTED",
-      "UNAUTHORIZED PRESENCE",
-      "FREQUENCY INTERCEPTED",
-      "REALITY GLITCH IN PROGRESS",
-      "ERROR: IDENTITY NOT FOUND",
-      "GHOST SIGNAL RECEIVED"
+    // Synthesize keyclick sounds dynamically
+    function playClickSound() {
+      if (STATE.isMuted) return;
+      initAudio();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        const freq = 1200 + Math.random() * 800;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc.type = 'triangle';
+
+        gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.05);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+      } catch (e) {}
+    }
+
+    // Play retro synthesizer beep notes
+    function playBeep(freq, duration, type = 'sine', volume = 0.1) {
+      if (STATE.isMuted) return;
+      initAudio();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    // Intrusion system alarm sweep sound
+    function playAlarmSweep() {
+      if (STATE.isMuted) return;
+      initAudio();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.6);
+
+        gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.6);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.6);
+      } catch(e){}
+    }
+
+    // Success cyber sweep chime
+    function playSuccessChime() {
+      if (STATE.isMuted) return;
+      setTimeout(() => playBeep(523.25, 0.1, 'sine', 0.15), 0);   // C5
+      setTimeout(() => playBeep(659.25, 0.1, 'sine', 0.15), 80);  // E5
+      setTimeout(() => playBeep(783.99, 0.15, 'sine', 0.15), 160); // G5
+      setTimeout(() => playBeep(1046.50, 0.3, 'sine', 0.2), 240);  // C6
+    }
+
+    // Failure chord sound
+    function playFailureChime() {
+      if (STATE.isMuted) return;
+      setTimeout(() => playBeep(180, 0.25, 'sawtooth', 0.15), 0);
+      setTimeout(() => playBeep(140, 0.4, 'sawtooth', 0.15), 120);
+    }
+
+    // Laser fire effect for the ASCII game
+    function playLaserFX() {
+      if (STATE.isMuted) return;
+      initAudio();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.15);
+
+        gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.15);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+      } catch (e) {}
+    }
+
+    // Explosion impact sound for game
+    function playExplosionFX() {
+      if (STATE.isMuted) return;
+      initAudio();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(30, audioCtx.currentTime + 0.4);
+
+        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+      } catch (e) {}
+    }
+
+
+    /* ==============================================
+       3. BIO / TERMINAL TEXT LOG DATA
+       ============================================== */
+    const DB = {
+      bio: [
+        "==================================================",
+        "IDENTITY BIO-DOSSIER: ALI HASAN",
+        "==================================================",
+        "Target Name  : Ali Hasan",
+        "Designation  : Digital Ghost / Network Specialist",
+        "Date of Birth: June 12, 2005",
+        "Clearance    : CLASSIFIED LEVEL 4",
+        "--------------------------------------------------",
+        "Ali Hasan is an enigmatic engineer, network security expert,",
+        "and frontend architect. Rumors depict him as a phantom in the machine,",
+        "capable of weaving system architectures considered untouchable.",
+        "",
+        "His core directive remains: <q class='glitch-text'>Reality is editable.</q>",
+        "",
+        "Type 'timeline' or 'skills' to scan further nodes."
+      ],
+      timeline: [
+        "==================================================",
+        "CHRONOLOGICAL EVENT LOG: TARGET ALI HASAN",
+        "==================================================",
+        "[ 2005 ] - Entity manifested on Grid Earth (June 12).",
+        "[ 2015 ] - First verified signature on decentralized forums.",
+        "[ 2018 ] - Compiled first custom visual simulator and network scanner.",
+        "[ 2020 ] - Breach simulation of secure government staging servers.",
+        "[ 2021 ] - THE BLACKOUT INCIDENT.",
+        "           Several regional power grids temporarily lost synchronization.",
+        "           Glitched screens displayed hex code: 12/06/2005.",
+        "[ 2025 ] - Vanished from conventional social arrays, leaving",
+        "           only encrypted, highly sophisticated web portals.",
+        "=================================================="
+      ],
+      skills: [
+        "==================================================",
+        "SYSYEM INTEL: OFFENSIVE & DEFENSIVE TECH MATRIX",
+        "==================================================",
+        "  - FRONTEND ENGINEERING   [██████████████████] 100% (HTML5/CSS3/ES12)",
+        "  - CYBERSECURITY AUDITING [████████████████░░]  90% (Network Intrusion)",
+        "  - NODE INFRASTRUCTURE    [███████████████░░░]  85% (Microservices)",
+        "  - UI/UX GLITCH DESIGN    [██████████████████] 100% (Immersive CRT SciFi)",
+        "  - GAME THEORY / CODING   [████████████████░░]  92% (Procedural Engines)",
+        "=================================================="
+      ],
+      secretDossier: [
+        "==================================================",
+        "████ CLASSIFIED DATA: FBI INTERNAL INTELLIGENCE ████",
+        "==================================================",
+        "SUBJECT HAS BYPASSED MAXIMUM SECURE PROTOCOLS.",
+        "BOUNTY VALUED AT $2,000,000 FOR DATA CORES RECOVERY.",
+        "",
+        "TRANSCRIPT INTERCEPTED (10.02.2024):",
+        "  'We tracked him through three layers of Tor relays, but ",
+        "   his terminal emitted a pulse that wiped our remote console.'",
+        "",
+        "SPECIAL ACCESS TOKEN GRANTED: [ALI_HASAN_GOD_MODE]",
+        "  Enter command: 'sudo override' to trigger system breakdown.",
+        "=================================================="
+      ]
+    };
+
+
+    /* ==============================================
+       4. BOOT PROTOCOL SYSTEM
+       ============================================== */
+    const bootSequenceLines = [
+      "COG-NET BIOS V7.12 RELEASED: 2025-06-12",
+      "COPYRIGHT (C) 2015-2025 COG-NET CORP.",
+      "----------------------------------------",
+      "CPU: Intel Neural Core v9 @ 4.80GHz",
+      "MEMORY: 67,108,864 KB OK (SYSTEM SECTOR VALID)",
+      "DETECTING STORAGE NODES... SECURE FLASH v3 DETECTED",
+      "INITIALIZING NETWORK PROTOCOLS...",
+      "TUNNELING SECURE PROXIES... SUCCESS",
+      "DECRYPTING CLIENT IDENTITY FRAMEWORK...",
+      "WARNING: ANOMALOUS SIGNS DETECTED IN LOGS",
+      "GHOST SIGNALS SPOTTED AT: 12.06.2005",
+      "----------------------------------------",
+      "ESTABLISHING IMMERSIVE CRT VISUAL SYSTEM...",
+      "SYNTHESIZING SOUND CARD OSCILLATORS... ACTIVE",
+      "COGNITIVE DECK PRE-LOAD: COMPLETE",
+      "----------------------------------------",
+      "INITIALIZING RETRO INTERACTIVE DESKTOP NODE...",
+      "TYPE 'help' FOR ACCESS LIST.",
+      "----------------------------------------",
+      "WELCOME BACK, INTRUDER."
     ];
 
-    function showPopup(msg){
-      popup.innerText=msg;
-      popup.style.display="block";
-      setTimeout(()=>popup.style.display="none",5000);
+    let bootLineIndex = 0;
+    const bootConsole = document.getElementById("bootConsole");
+
+    function runBoot() {
+      if (STATE.bootSkipped) return;
+      if (bootLineIndex < bootSequenceLines.length) {
+        const line = bootSequenceLines[bootLineIndex];
+        const p = document.createElement("div");
+        p.className = line.includes("WARNING") ? "line-error" : (line.includes("SUCCESS") ? "line-success" : "");
+        p.innerHTML = line;
+        bootConsole.appendChild(p);
+        bootConsole.scrollTop = bootConsole.scrollHeight;
+
+        // Sound beat
+        if (bootLineIndex % 3 === 0) {
+          playBeep(440 + bootLineIndex * 40, 0.08, 'sawtooth', 0.05);
+        } else {
+          playBeep(1200, 0.01, 'sine', 0.05);
+        }
+
+        bootLineIndex++;
+        setTimeout(runBoot, 120 + Math.random() * 200);
+      } else {
+        setTimeout(skipBoot, 1000);
+      }
     }
 
-    function randomPopup(){
-      const msg=popupMessages[Math.floor(Math.random()*popupMessages.length)];
-      showPopup(msg);
-      const nextTime=5000+Math.random()*10000; // 5-15 sec
-      setTimeout(randomPopup,nextTime);
-    }
-    setTimeout(randomPopup,5000);
+    function skipBoot() {
+      if (STATE.bootSkipped) return;
+      STATE.bootSkipped = true;
+      document.getElementById("bootOverlay").style.display = "none";
+      playSuccessChime();
 
-    /* === SECRET LINK === */
-    let clicks=0;
-    document.querySelector(".secret-link").addEventListener("click",()=>{
-      clicks++;
-      showPopup("Decrypting secret...");
-      if(clicks>=3){
-        window.location.href="https://www.instagram.com/ig.alihasan";
+      // Initialize layout systems
+      initTerminal();
+      initLiveDiagnostics();
+      initMatrixRain();
+      initEqualizer();
+    }
+
+    // Capture keyboard input to skip boot
+    window.addEventListener("keydown", (e) => {
+      if (!STATE.bootSkipped) {
+        skipBoot();
       }
     });
-  </script></body>
+
+
+    /* ==============================================
+       5. MATRIX CODE RAIN ANIMATION (Canvas)
+       ============================================== */
+    let matrixInterval = null;
+    let isMatrixRainActive = true;
+    const matrixCanvas = document.getElementById('matrixRain');
+    const matrixCtx = matrixCanvas.getContext('2d');
+
+    function initMatrixRain() {
+      resizeMatrixCanvas();
+      window.addEventListener('resize', resizeMatrixCanvas);
+
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789☣⚡★░▒▓█░'.split('');
+      const fontSize = 14;
+      let columns = matrixCanvas.width / fontSize;
+      let drops = [];
+      for (let x = 0; x < columns; x++) drops[x] = 1;
+
+      function draw() {
+        if (!isMatrixRainActive) return;
+
+        // Use theme primary color for trails
+        let themeColor = '0, 255, 102'; // default green
+        if (STATE.currentTheme === 'amber') themeColor = '255, 176, 0';
+        if (STATE.currentTheme === 'cyberpunk') themeColor = '0, 255, 255';
+        if (STATE.currentTheme === 'red') themeColor = '255, 51, 51';
+
+        matrixCtx.fillStyle = 'rgba(' + (STATE.currentTheme === 'cyberpunk' ? '10, 0, 15' : '1, 4, 2') + ', 0.08)';
+        matrixCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+
+        matrixCtx.fillStyle = 'rgba(' + themeColor + ', 0.8)';
+        matrixCtx.font = fontSize + 'px monospace';
+
+        for (let i = 0; i < drops.length; i++) {
+          const text = letters[Math.floor(Math.random() * letters.length)];
+          matrixCtx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+          if (drops[i] * fontSize > matrixCanvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
+        }
+      }
+
+      if (matrixInterval) clearInterval(matrixInterval);
+      matrixInterval = setInterval(draw, 50);
+    }
+
+    function resizeMatrixCanvas() {
+      matrixCanvas.width = window.innerWidth;
+      matrixCanvas.height = window.innerHeight;
+    }
+
+
+    /* ==============================================
+       6. AUDIO SPECTRUM EQUALIZER SIMULATOR
+       ============================================== */
+    const eqCanvas = document.getElementById("eqCanvas");
+    const eqCtx = eqCanvas.getContext("2d");
+    let eqInterval = null;
+
+    function initEqualizer() {
+      eqCanvas.width = eqCanvas.clientWidth;
+      eqCanvas.height = eqCanvas.clientHeight;
+
+      const barCount = 18;
+      const barWidth = eqCanvas.width / barCount;
+      const barHeights = new Array(barCount).fill(10);
+
+      function drawEQ() {
+        eqCtx.clearRect(0, 0, eqCanvas.width, eqCanvas.height);
+
+        // Define color gradient
+        let fillStyle = '#00ff66';
+        if (STATE.currentTheme === 'amber') fillStyle = '#ffb000';
+        if (STATE.currentTheme === 'cyberpunk') fillStyle = '#ff007f';
+        if (STATE.currentTheme === 'red') fillStyle = '#ff3333';
+
+        eqCtx.fillStyle = fillStyle;
+
+        for (let i = 0; i < barCount; i++) {
+          // Add some randomness but smooth transitions
+          const target = STATE.isMuted ? 2 : Math.floor(Math.random() * 32) + 4;
+          barHeights[i] += (target - barHeights[i]) * 0.3;
+
+          const x = i * barWidth;
+          const y = eqCanvas.height - barHeights[i];
+          const height = barHeights[i];
+
+          eqCtx.fillRect(x + 2, y, barWidth - 4, height);
+        }
+      }
+
+      if (eqInterval) clearInterval(eqInterval);
+      eqInterval = setInterval(drawEQ, 80);
+    }
+
+
+    /* ==============================================
+       7. TERMINAL SYSTEM & TYPING ENGINE
+       ============================================== */
+    const terminalOutput = document.getElementById("terminalOutput");
+    const terminalInput = document.getElementById("terminalInput");
+    const inputCursor = document.getElementById("inputCursor");
+
+    function initTerminal() {
+      // Welcome message print
+      writeLines([
+        "=============================================================",
+        "    ___    __     ____   __  __   ___    _____   ___    _   __",
+        "   / _ \\  / /    /  _/  / / / /  / _ \\  / ___/  / _ \\  / | / /",
+        "  / __ / / /__  _/ /_  / _  _ /  / _  / _\\_ \\  / (_) / /  |/ / ",
+        " /_/ |_|/____/ /____/ /_//_//_/ /_//_/ /____/  \\___/  /_/|_/  ",
+        "=============================================================",
+        "               ALI HASAN // SECURITY COG-NET CORE v7.1",
+        "=============================================================",
+        "System diagnostics completed. Proxy tunnels stabilized.",
+        "Enter 'help' to review directory controls.",
+        "Enter 'play' or 'decrypt' to start immersive game nodes.",
+        "============================================================="
+      ], "line-success");
+
+      // Position visual custom cursor
+      positionCustomCursor();
+      terminalInput.addEventListener("input", positionCustomCursor);
+      terminalInput.addEventListener("keydown", handleTerminalKeydown);
+
+      // Auto-focus terminal input on workspace click
+      document.querySelector(".main-terminal").addEventListener("click", () => {
+        terminalInput.focus();
+      });
+    }
+
+    function positionCustomCursor() {
+      // Approximate character width in monospaced font
+      const charWidth = 9.6;
+      const length = terminalInput.value.length;
+      inputCursor.style.left = (9 + (length * charWidth)) + "px";
+    }
+
+    // Prints a line on the terminal with a retro typing speed
+    function writeLine(text, type = "", speed = 10) {
+      const line = document.createElement("div");
+      line.className = type;
+      terminalOutput.appendChild(line);
+      terminalOutput.scrollTop = terminalOutput.scrollHeight;
+
+      if (speed <= 0) {
+        line.innerHTML = text;
+        return;
+      }
+
+      let charIndex = 0;
+      STATE.isTyping = true;
+
+      function typeChar() {
+        if (charIndex < text.length) {
+          const char = text.charAt(charIndex);
+          if (char === '<') {
+            // fast-forward HTML tags
+            const tagEnd = text.indexOf('>', charIndex);
+            line.innerHTML += text.substring(charIndex, tagEnd + 1);
+            charIndex = tagEnd + 1;
+          } else {
+            line.innerHTML += char;
+            charIndex++;
+          }
+          playClickSound();
+          setTimeout(typeChar, speed);
+        } else {
+          STATE.isTyping = false;
+        }
+      }
+      typeChar();
+    }
+
+    function writeLines(lines, type = "", index = 0) {
+      if (index < lines.length) {
+        writeLine(lines[index], type, 12);
+        setTimeout(() => {
+          writeLines(lines, type, index + 1);
+        }, 150);
+      }
+    }
+
+
+    /* ==============================================
+       8. COMMAND ENGINE PARSER
+       ============================================== */
+    function handleTerminalKeydown(e) {
+      if (e.key === 'Enter') {
+        const cmd = terminalInput.value.trim();
+        terminalInput.value = "";
+        positionCustomCursor();
+
+        if (cmd) {
+          STATE.inputHistory.push(cmd);
+          STATE.historyIndex = STATE.inputHistory.length;
+
+          // Print prompt echo
+          const p = document.createElement("div");
+          p.innerHTML = `<span style="color:var(--primary)">guest@cognet-node:~#</span> <span style="color:#fff">${cmd}</span>`;
+          terminalOutput.appendChild(p);
+
+          processCommand(cmd);
+        }
+      } else if (e.key === 'ArrowUp') {
+        if (STATE.historyIndex > 0) {
+          STATE.historyIndex--;
+          terminalInput.value = STATE.inputHistory[STATE.historyIndex];
+          setTimeout(positionCustomCursor, 10);
+        }
+        e.preventDefault();
+      } else if (e.key === 'ArrowDown') {
+        if (STATE.historyIndex < STATE.inputHistory.length - 1) {
+          STATE.historyIndex++;
+          terminalInput.value = STATE.inputHistory[STATE.historyIndex];
+          setTimeout(positionCustomCursor, 10);
+        } else {
+          STATE.historyIndex = STATE.inputHistory.length;
+          terminalInput.value = "";
+          setTimeout(positionCustomCursor, 10);
+        }
+        e.preventDefault();
+      }
+    }
+
+    function processCommand(input) {
+      const parts = input.toLowerCase().split(' ');
+      const cmd = parts[0];
+      const arg = parts[1];
+
+      // Reset any active terminal minigames if inputting normal commands
+      if (STATE.activeGame && !['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(cmd)) {
+        closeGameViewport();
+      }
+
+      switch (cmd) {
+        case 'help':
+          writeLines([
+            "SYSTEM ACCESS GRANTED. CORE COMMAND DIRECTORY:",
+            "--------------------------------------------------",
+            "  help          - Display this command console list.",
+            "  about / bio   - Scan biography of Ali Hasan.",
+            "  timeline      - Access chronological events archive.",
+            "  skills        - Audit current expertise levels.",
+            "  play          - Initialize the ASCII Maze cyber-intrusion game.",
+            "  decrypt       - Run Fallout-style memory matrix hacking tool.",
+            "  secret        - Access secure federal intelligence files.",
+            "  social        - Retrieve official social link arrays.",
+            "  theme [name]  - Swap deck color presets: green, amber, cyberpunk, red.",
+            "  matrix        - Toggle screen phosphor matrix stream (on / off).",
+            "  clear         - Wipe all temporary log files.",
+            "--------------------------------------------------",
+            "Macro hotkeys are available in the left system panel."
+          ], "line-success");
+          break;
+
+        case 'bio':
+        case 'about':
+          writeLines(DB.bio, "line-success");
+          break;
+
+        case 'timeline':
+          writeLines(DB.timeline, "line-success");
+          break;
+
+        case 'skills':
+          writeLines(DB.skills, "line-success");
+          break;
+
+        case 'clear':
+          terminalOutput.innerHTML = "";
+          writeLine("Terminal cache cleared.", "line-success");
+          break;
+
+        case 'play':
+          startMazeGame();
+          break;
+
+        case 'decrypt':
+          startFalloutGame();
+          break;
+
+        case 'social':
+          writeLines([
+            "LINK STABILIZED: SECURE INSTAGRAM INTERACTION DETECTED",
+            "--------------------------------------------------",
+            "  Instagram: @ig.alihasan",
+            "  Direct URL: https://www.instagram.com/ig.alihasan",
+            "--------------------------------------------------",
+            "Opening cyber portal connection..."
+          ], "line-success");
+          playSuccessChime();
+          setTimeout(() => {
+            window.open("https://www.instagram.com/ig.alihasan", "_blank");
+          }, 1500);
+          break;
+
+        case 'secret':
+          if (STATE.decryptionCores >= 3) {
+            writeLines(DB.secretDossier, "line-accent");
+          } else {
+            writeLines([
+              "[ ACCESS DENIED ]: SECURE FIREWALL PREVENTS CONNECTION.",
+              "AUTHENTICATION REQUIRED: Crack at least 3 levels of games",
+              "to decrypt this federal intel! Current level: " + STATE.decryptionCores + " / 3"
+            ], "line-error");
+            playFailureChime();
+          }
+          break;
+
+        case 'matrix':
+          if (arg === 'off') {
+            isMatrixRainActive = false;
+            matrixCanvas.style.opacity = "0";
+            writeLine("Matrix simulation disabled.", "line-warning");
+          } else {
+            isMatrixRainActive = true;
+            matrixCanvas.style.opacity = "0.15";
+            writeLine("Matrix simulation initialized.", "line-success");
+          }
+          break;
+
+        case 'theme':
+          if (['green', 'amber', 'cyberpunk', 'red'].includes(arg)) {
+            switchTheme(arg);
+            writeLine(`System core color mapped to: ${arg.toUpperCase()}`, "line-success");
+          } else {
+            writeLine("Invalid. Supported themes: green, amber, cyberpunk, red", "line-error");
+          }
+          break;
+
+        case 'sudo':
+          if (arg === 'override') {
+            triggerFullGlitchBreakdown();
+          } else {
+            writeLine("ADMIN PASSWORD REQUIRED FOR SUDO CONTROL.", "line-error");
+            playFailureChime();
+          }
+          break;
+
+        default:
+          writeLine(`Command not found: '${cmd}'. Enter 'help' for directory rules.`, "line-error");
+          playFailureChime();
+          break;
+      }
+    }
+
+    function executeMacro(cmd) {
+      playClickSound();
+      terminalInput.value = cmd;
+      positionCustomCursor();
+      terminalInput.focus();
+
+      // Simulate input enter
+      const event = new KeyboardEvent('keydown', { key: 'Enter' });
+      handleTerminalKeydown(event);
+    }
+
+
+    /* ==============================================
+       9. GAME 1: CYBER-INFILTRATOR (ASCII Maze Game)
+       ============================================== */
+    const mazeMapRaw = [
+      "███████████████",
+      "█▲.█.....█...█",
+      "█.██.███.███.█",
+      "█....█★█.....█",
+      "████.█.█.█████",
+      "█....█.█.....█",
+      "█.████.█████.█",
+      "█.█★.......█.█",
+      "█.█.██████.█.█",
+      "█.█.█★...█.█.█",
+      "█.█.████.█.█.█",
+      "█...█....█★..█",
+      "█████.██████.█",
+      "█★...........█",
+      "███████████████"
+    ];
+
+    let gameData = {
+      player: { x: 1, y: 1 },
+      grid: [],
+      dataCoresTotal: 0,
+      dataCoresFound: 0,
+      patrols: [
+        { x: 5, y: 5, dirX: 1, dirY: 0 },
+        { x: 11, y: 11, dirX: 0, dirY: -1 },
+        { x: 13, y: 3, dirX: -1, dirY: 0 }
+      ],
+      moves: 0
+    };
+
+    function startMazeGame() {
+      STATE.activeGame = "maze";
+      document.getElementById("gameViewport").style.display = "block";
+      document.getElementById("gameTitle").innerText = "CYBER-INFILTRATOR v1.0";
+      document.getElementById("mobileControls").style.display = "grid";
+
+      writeLines([
+        "LAUNCHING CYBER-INFILTRATOR NODE...",
+        "INSTRUCTIONS: INFILTRATE SECURITY MATRIX.",
+        "Use arrow keys, WASD, or the side D-Pad to navigate.",
+        "Collect all Data Cores [★] and reach system port.",
+        "AVOID DEFENSE FIREWALLS [⚡]!"
+      ], "line-success");
+
+      // Load Map
+      gameData.grid = mazeMapRaw.map(row => row.split(''));
+      gameData.player = { x: 1, y: 1 };
+      gameData.dataCoresFound = 0;
+      gameData.dataCoresTotal = 0;
+
+      // Count cores
+      for(let y=0; y<gameData.grid.length; y++) {
+        for(let x=0; x<gameData.grid[y].length; x++) {
+          if (gameData.grid[y][x] === '★') {
+            gameData.dataCoresTotal++;
+          }
+        }
+      }
+
+      playSuccessChime();
+      renderMaze();
+      window.addEventListener("keydown", handleGameKeys);
+    }
+
+    function handleGameKeys(e) {
+      if (STATE.activeGame !== "maze") return;
+      let key = e.key.toLowerCase();
+      if (['arrowup', 'w'].includes(key)) movePlayer(0, -1);
+      if (['arrowdown', 's'].includes(key)) movePlayer(0, 1);
+      if (['arrowleft', 'a'].includes(key)) movePlayer(-1, 0);
+      if (['arrowright', 'd'].includes(key)) movePlayer(1, 0);
+      e.preventDefault();
+    }
+
+    function handleDPad(direction) {
+      playClickSound();
+      if (STATE.activeGame === "maze") {
+        if (direction === 'UP') movePlayer(0, -1);
+        if (direction === 'DOWN') movePlayer(0, 1);
+        if (direction === 'LEFT') movePlayer(-1, 0);
+        if (direction === 'RIGHT') movePlayer(1, 0);
+      } else if (STATE.activeGame === "fallout") {
+        // can implement bracket reset simulation
+      }
+    }
+
+    function movePlayer(dx, dy) {
+      if (STATE.activeGame !== "maze") return;
+      const nx = gameData.player.x + dx;
+      const ny = gameData.player.y + dy;
+
+      if (gameData.grid[ny][nx] !== '█') {
+        // Move player representation
+        gameData.player.x = nx;
+        gameData.player.y = ny;
+        gameData.moves++;
+
+        // Collect Core
+        if (gameData.grid[ny][nx] === '★') {
+          gameData.grid[ny][nx] = '.';
+          gameData.dataCoresFound++;
+          playLaserFX();
+          writeLine(`[ DATA GRABBED ] Decrypted packet core (${gameData.dataCoresFound}/${gameData.dataCoresTotal})`, "line-accent");
+
+          if (gameData.dataCoresFound === gameData.dataCoresTotal) {
+            writeLine("ALL CORES HARVESTED. Gate node [░] activated at bottom right!", "line-success");
+            // open exit gateway
+            gameData.grid[13][13] = '░';
+          }
+        }
+
+        // Win check
+        if (gameData.grid[ny][nx] === '░') {
+          winMazeGame();
+          return;
+        }
+
+        // Move patrols
+        movePatrols();
+
+        // Check crash
+        checkPatrolCrash();
+
+        renderMaze();
+      }
+    }
+
+    function movePatrols() {
+      gameData.patrols.forEach(p => {
+        let nx = p.x + p.dirX;
+        let ny = p.y + p.dirY;
+
+        // Bounce off walls
+        if (gameData.grid[ny][nx] === '█' || gameData.grid[ny][nx] === '░') {
+          p.dirX *= -1;
+          p.dirY *= -1;
+          nx = p.x + p.dirX;
+          ny = p.y + p.dirY;
+        }
+
+        p.x = nx;
+        p.y = ny;
+      });
+    }
+
+    function checkPatrolCrash() {
+      gameData.patrols.forEach(p => {
+        if (p.x === gameData.player.x && p.y === gameData.player.y) {
+          playExplosionFX();
+          writeLine("[ INTRUSION FAULT ]: Security firewall caught you. Purging terminal cache...", "line-error");
+          loseMazeGame();
+        }
+      });
+    }
+
+    function renderMaze() {
+      const renderGrid = gameData.grid.map(row => [...row]);
+
+      // Inject player
+      renderGrid[gameData.player.y][gameData.player.x] = '▲';
+
+      // Inject patrols
+      gameData.patrols.forEach(p => {
+        renderGrid[p.y][p.x] = '⚡';
+      });
+
+      const mazeStr = renderGrid.map(row => row.join('')).join('\n');
+      document.getElementById("gameScreen").innerHTML = `<pre class="maze-grid">${mazeStr}</pre>`;
+      document.getElementById("gameScores").innerText = `DATA CORES: ${gameData.dataCoresFound}/${gameData.dataCoresTotal}`;
+    }
+
+    function winMazeGame() {
+      playSuccessChime();
+      writeLines([
+        "=========================================",
+        "✦✦✦ SYSTEM INFILTRATION COMPLETE ✦✦✦",
+        "=========================================",
+        "Security firewalls successfully bypassed.",
+        "You have unlocked 1/3 classified clearances."
+      ], "line-success");
+
+      addDecryptedCore();
+      closeGameViewport();
+    }
+
+    function loseMazeGame() {
+      playFailureChime();
+      closeGameViewport();
+    }
+
+    function closeGameViewport() {
+      STATE.activeGame = null;
+      document.getElementById("gameViewport").style.display = "none";
+      window.removeEventListener("keydown", handleGameKeys);
+    }
+
+
+    /* ==============================================
+       10. GAME 2: DECRYPTOR (Fallout Memory Matrix Game)
+       ============================================== */
+    const falloutWords = ["OVERRIDE", "SECURITY", "PROTOCOL", "QUANTUM", "FIREWALL", "DATACORE", "DATABASE", "GRIDLOCK", "BREACHED"];
+    let falloutData = {
+      secretWord: "",
+      attemptsLeft: 4,
+      words: []
+    };
+
+    function startFalloutGame() {
+      STATE.activeGame = "fallout";
+      document.getElementById("gameViewport").style.display = "block";
+      document.getElementById("gameTitle").innerText = "COG-NET DECRYPTOR v3.0";
+      document.getElementById("mobileControls").style.display = "none";
+
+      writeLines([
+        "LAUNCHING DIGITAL DECRYPT PROTOCOL...",
+        "CRITICAL DETECT: MEMORY INTRUSION SCHEDULER ACTIVE.",
+        "CHOOSE PASSWORD: Determine correct entry keyword.",
+        "Each word clicked/submitted returns likeness match score.",
+        "Beware: 4 failed logins triggers lockdown."
+      ], "line-success");
+
+      // Generate pool
+      falloutData.attemptsLeft = 4;
+      falloutData.words = [...falloutWords].sort(() => Math.random() - 0.5).slice(0, 6);
+      falloutData.secretWord = falloutData.words[Math.floor(Math.random() * falloutData.words.length)];
+
+      renderFallout();
+    }
+
+    function renderFallout() {
+      let screenHTML = `<div>SECURE BIOS ATTEMPTS REMAINING: ${"█ ".repeat(falloutData.attemptsLeft)}</div><br>`;
+      screenHTML += `<div style="text-align:left; font-family:monospace; margin:0 auto; max-width:300px; line-height:1.4;">`;
+
+      const hexChars = "0123456789ABCDEF";
+      falloutData.words.forEach((word, index) => {
+        // Random hex prefix
+        let hex = "0x" + Array.from({length:4}, () => hexChars[Math.floor(Math.random()*16)]).join('');
+        screenHTML += `<div>${hex} <span class="fallout-word" onclick="guessFalloutWord('${word}')">${word}</span></div>`;
+      });
+      screenHTML += "</div>";
+
+      document.getElementById("gameScreen").innerHTML = screenHTML;
+      document.getElementById("gameScores").innerText = `LOGINS LEFT: ${falloutData.attemptsLeft}`;
+    }
+
+    function guessFalloutWord(word) {
+      if (STATE.activeGame !== "fallout") return;
+      playClickSound();
+
+      if (word === falloutData.secretWord) {
+        playSuccessChime();
+        writeLines([
+          "----------------------------------------",
+          "SUCCESS: ALIAS SECURE LOGIN GRANTED.",
+          "ACCESSING SECURE MAINFRAME DOSSIER...",
+          "Use 'secret' command to access government logs."
+        ], "line-success");
+        addDecryptedCore();
+        closeGameViewport();
+      } else {
+        falloutData.attemptsLeft--;
+        playFailureChime();
+
+        // Calculate Likeness
+        let likeness = 0;
+        for(let i=0; i<Math.min(word.length, falloutData.secretWord.length); i++) {
+          if (word[i] === falloutData.secretWord[i]) likeness++;
+        }
+
+        writeLine(`[ LOG IN FAILED ]: '${word}' - Likeness: ${likeness}/${falloutData.secretWord.length}`, "line-warning");
+
+        if (falloutData.attemptsLeft <= 0) {
+          writeLine("[ SYSTEM LOCKED ]: Core memory dump initiated.", "line-error");
+          closeGameViewport();
+        } else {
+          renderFallout();
+        }
+      }
+    }
+
+
+    /* ==============================================
+       11. INTERACTIVE REAL-TIME GLITCHES & THEMING
+       ============================================== */
+    function switchTheme(theme) {
+      document.body.setAttribute("data-theme", theme);
+      STATE.currentTheme = theme;
+      playBeep(880, 0.1, 'sine', 0.1);
+
+      // Reset theme button active classes
+      document.querySelectorAll(".theme-btn").forEach(btn => btn.classList.remove("active"));
+      const activeBtn = document.getElementById(`theme-${theme}`);
+      if (activeBtn) activeBtn.classList.add("active");
+
+      // Reinstate Matrix colors
+      if (isMatrixRainActive) {
+        initMatrixRain();
+      }
+    }
+
+    function addDecryptedCore() {
+      STATE.decryptionCores++;
+      const val = Math.min(STATE.decryptionCores, 3);
+      document.getElementById("completedCoresCount").innerText = `${val} / 3`;
+      document.getElementById("decryptedProgressFill").style.width = `${(val / 3) * 100}%`;
+
+      if (val >= 3) {
+        showGlobalPopup("CLASSIFIED INTEL DECRYPTED", "Security clearances bypassed. CIA files on Ali Hasan are now unlocked. Type 'secret' in the terminal to view.");
+      }
+    }
+
+    // Toggle sound globally
+    function toggleAudioGlobal() {
+      STATE.isMuted = !STATE.isMuted;
+      const icon = document.getElementById("audioSpeakerIcon");
+      const label = document.getElementById("audioStateLabel");
+      const toggleBtn = document.getElementById("audioToggleBtn");
+
+      if (STATE.isMuted) {
+        icon.innerText = "🔇";
+        label.innerText = "AUDIO [MUTED]";
+        toggleBtn.classList.add("muted");
+      } else {
+        icon.innerText = "🔊";
+        label.innerText = "AUDIO [ON]";
+        toggleBtn.classList.remove("muted");
+        playBeep(600, 0.15, 'sine', 0.1);
+      }
+    }
+
+    // Live diagnostics animation loop
+    function initLiveDiagnostics() {
+      setInterval(() => {
+        // Change CPU usage slightly
+        const randomCPU = Math.floor(Math.random() * 45) + 15;
+        document.getElementById("diagCPUVal").innerText = randomCPU + "%";
+        document.getElementById("diagCPUBar").style.width = randomCPU + "%";
+
+        // Add fun lines to warning logger
+        const warnings = [
+          "[ OK ] Active packet bypass optimized.",
+          "[ ALARM ] Firewall probe detected from node 192.168.1.105",
+          "[ INFO ] Memory sequence garbage disposal active.",
+          "[ WARN ] Decryptor packet stream sync lagging.",
+          "[ SYSTEM ] Integrity check: 100% stable."
+        ];
+        if (Math.random() > 0.8) {
+          const container = document.getElementById("alertContainer");
+          const newLine = document.createElement("div");
+          const msg = warnings[Math.floor(Math.random()*warnings.length)];
+          if (msg.includes("ALARM")) {
+            newLine.className = "line-error";
+            playAlarmSweep();
+          } else if (msg.includes("WARN")) {
+            newLine.className = "line-warning";
+          } else {
+            newLine.className = "line-success";
+          }
+          newLine.innerText = msg;
+          container.appendChild(newLine);
+          if (container.children.length > 5) {
+            container.removeChild(container.firstChild);
+          }
+        }
+      }, 3000);
+    }
+
+    // Interactive Real-Time ASCII Portrait Converter!
+    function handleProfileTrigger() {
+      playBeep(800, 0.1, 'square', 0.1);
+      writeLines([
+        "--------------------------------------------------",
+        "DECRYPTING PROFILE IMAGE ARRAY...",
+        "CONVERTING VECTOR MATRIX BINARIES TO RETRO ASCII...",
+        "--------------------------------------------------"
+      ], "line-success");
+
+      // Draw beautiful ASCII art representation directly in the terminal
+      setTimeout(() => {
+        writeLines([
+          "      .::.           .::.      ",
+          "    .::::::.       .::::::.    ",
+          "   .:::::::::      :::::::::.  ",
+          "   ::::::::::      ::::::::::  ",
+          "   ::::::::::      ::::::::::  ",
+          "   `::::::::'      `::::::::'  ",
+          "     `::::'          `::::'    ",
+          "                               ",
+          "          ALI HASAN            ",
+          "     ======================    ",
+          "     CYBERNETIC COGNITION V7   ",
+          "     ======================    "
+        ], "line-accent");
+      }, 1000);
+    }
+
+    // Trigger full system glitch easter egg breakdown
+    function triggerFullGlitchBreakdown() {
+      playAlarmSweep();
+      document.body.style.filter = "invert(1) hue-rotate(180deg)";
+      setTimeout(() => {
+        document.body.style.filter = "none";
+      }, 300);
+
+      writeLines([
+        "##################################################",
+        "!!! WARNING: SUDO OVERRIDE TRIGGERED BY CLIENT !!!",
+        "SYSTEM STABILIZATION PROTOCOL OFFLINE...",
+        "MELTDOWN COMPROMISED. REBOOTING LOGICAL MODULES...",
+        "##################################################"
+      ], "line-error");
+
+      setTimeout(() => {
+        document.body.style.transform = "skewX(10deg)";
+      }, 500);
+      setTimeout(() => {
+        document.body.style.transform = "none";
+      }, 800);
+
+      setTimeout(() => {
+        STATE.bootSkipped = false;
+        bootConsole.innerHTML = "";
+        bootLineIndex = 0;
+        document.getElementById("bootOverlay").style.display = "flex";
+        runBoot();
+      }, 2500);
+    }
+
+    // Real-time custom visual popups
+    function showGlobalPopup(header, text) {
+      document.getElementById("popupHeader").innerText = header;
+      document.getElementById("popupBody").innerText = text;
+      document.getElementById("systemPopup").style.display = "block";
+      playAlarmSweep();
+    }
+
+    function closePopup() {
+      playClickSound();
+      document.getElementById("systemPopup").style.display = "none";
+    }
+
+    // Set interactive clock
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById("systemClock").innerText = now.toTimeString().split(' ')[0];
+    }, 1000);
+
+
+    /* ==============================================
+       12. INITIALIZATION ENTRY POINT
+       ============================================== */
+    window.onload = () => {
+      runBoot();
+    };
+
+  </script>
+</body>
 </html>
